@@ -8,6 +8,7 @@ func LocalMangaRoutes(routerGroup *gin.RouterGroup) {
 	localMangaGroup := routerGroup.Group("local")
 	{
 		localMangaGroup.GET("/", IndexView)
+		localMangaGroup.POST("/upload", UploadView)
 
 	}
 }
