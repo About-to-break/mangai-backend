@@ -1,7 +1,7 @@
 DOCKER_COMPOSE = docker compose
 COMPOSE_FILE = docker-compose.yml
 
-.PHONY: run stop logs rebuild build config wipe
+.PHONY: run stop logs rebuild build config wipe swaga
 
 run:
 	$(DOCKER_COMPOSE) up -d
@@ -24,3 +24,6 @@ config:
 
 wipe:
 	$(DOCKER_COMPOSE) down -v
+
+swaga:
+	swag init -g cmd/server/main.go -o docs
