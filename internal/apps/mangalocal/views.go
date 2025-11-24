@@ -2,16 +2,21 @@ package mangalocal
 
 import (
 	"backend/internal/services"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"log/slog"
 	"net/http"
 	"path/filepath"
 )
 
 type UploadController struct {
-	Storage services.StorageService
-	Bucket  string
+	Storage  services.StorageService
+	Queue    services.QueueService
+	Bucket   string
+	Exchange string
+	Key      string
 }
 
 // IndexView отдаёт статический frontend
@@ -46,11 +51,13 @@ func (u *UploadController) UploadView(c *gin.Context) {
 	src, err := file.Open()
 
 	if err != nil {
+		slog.Error("Error opening file", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	defer src.Close()
 
+	// UUID
 	id := uuid.New().String()
 	ext := filepath.Ext(file.Filename)
 	makeDir := c.DefaultPostForm("make_dir", "true")
@@ -61,11 +68,26 @@ func (u *UploadController) UploadView(c *gin.Context) {
 		objectName = fmt.Sprintf("%s%s", id, ext)
 	}
 
+	// Storage
 	err = u.Storage.UploadFile(u.Bucket, objectName, src, file.Size, file.Header.Get("Content-Type"))
 
 	if err != nil {
+		slog.Error("Upload Error:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+	slog.Debug("Successfully uploaded file")
+	// Queue
+	if u.Queue != nil && u.Exchange != "" && u.Key != "" {
+		msg := map[string]string{"uuid": id, "object_name": objectName}
+		body, _ := json.Marshal(msg)
+		err = u.Queue.Publish(u.Exchange, u.Key, body)
+		if err != nil {
+			slog.Error("Error sending message to queue")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		slog.Debug("Successfully set queue task")
 	}
 
 	c.JSON(http.StatusOK, gin.H{

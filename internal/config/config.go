@@ -12,8 +12,9 @@ type Config struct {
 	ServerPort string
 	LogLevel   string
 
-	RabbitExchange string
-	RabbitURI      string
+	RabbitExchange   string
+	RabbitURI        string
+	RabbitRoutingKey string
 
 	MinioEndpoint  string
 	MinioAccessKey string
@@ -47,6 +48,10 @@ func LoadConfig() *Config {
 	if rabbitURI == "" {
 		slog.Error("No RABBITMQ_URI specified")
 	}
+	rabbitRoutingKey := os.Getenv("RABBITMQ_ROUTING_KEY")
+	if rabbitRoutingKey == "" {
+		slog.Error("No RABBITMQ_ROUTING_KEY specified")
+	}
 
 	// Minio
 	minioEndpoint := os.Getenv("MINIO_ENDPOINT")
@@ -75,14 +80,15 @@ func LoadConfig() *Config {
 
 	slog.Info("Loading config successful")
 	return &Config{
-		ServerPort:     serverPort,
-		LogLevel:       logLevel,
-		RabbitExchange: rabbitExchange,
-		RabbitURI:      rabbitURI,
-		MinioEndpoint:  minioEndpoint,
-		MinioAccessKey: minioAccessKey,
-		MinioSecretKey: minioSecretKey,
-		MinioUseSSL:    minioSSL,
-		MinioBucket:    minioBucket,
+		ServerPort:       serverPort,
+		LogLevel:         logLevel,
+		RabbitExchange:   rabbitExchange,
+		RabbitURI:        rabbitURI,
+		RabbitRoutingKey: rabbitRoutingKey,
+		MinioEndpoint:    minioEndpoint,
+		MinioAccessKey:   minioAccessKey,
+		MinioSecretKey:   minioSecretKey,
+		MinioUseSSL:      minioSSL,
+		MinioBucket:      minioBucket,
 	}
 }

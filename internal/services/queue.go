@@ -1,5 +1,5 @@
 package services
 
 type QueueService interface {
-	Publish(queue string, body []byte) error
+	Publish(exchange string, key string, body []byte) error
 }

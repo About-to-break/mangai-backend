@@ -4,7 +4,6 @@ import (
 	"backend/internal/config"
 	"backend/internal/logger"
 	"backend/internal/router"
-	"backend/internal/services"
 	"log/slog"
 )
 
@@ -13,14 +12,7 @@ func main() {
 
 	logger.SetupLogger(cfg.LogLevel)
 
-	storage, _ := services.NewMinioStorage(
-		cfg.MinioEndpoint,
-		cfg.MinioAccessKey,
-		cfg.MinioSecretKey,
-		cfg.MinioUseSSL,
-	)
-
-	r := router.SetupRouters(cfg, storage)
+	r := router.SetupRouters(cfg)
 
 	err := r.Run(":" + cfg.ServerPort)
 

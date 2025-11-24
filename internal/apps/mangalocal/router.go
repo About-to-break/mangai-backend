@@ -4,12 +4,34 @@ import (
 	"backend/internal/config"
 	"backend/internal/services"
 	"github.com/gin-gonic/gin"
+	"log/slog"
 )
 
-func LocalMangaRoutes(routerGroup *gin.RouterGroup, cfg *config.Config, storage services.StorageService) {
+func SetupLocalMangaRoutes(routerGroup *gin.RouterGroup, cfg *config.Config) {
+
+	uploadStorage, err := services.NewMinioStorage(
+		cfg.MinioEndpoint,
+		cfg.MinioAccessKey,
+		cfg.MinioSecretKey,
+		cfg.MinioUseSSL,
+	)
+	if err != nil {
+		slog.Error("Setting up storage failed", err)
+	}
+
+	uploadQueue, err := services.NewRabbitMQueue(
+		cfg.RabbitURI,
+	)
+	if err != nil {
+		slog.Error("Setting up queue failed", err)
+	}
+
 	imageUploadCtrl := UploadController{
-		Storage: storage,
-		Bucket:  cfg.MinioBucket,
+		Storage:  uploadStorage,
+		Queue:    uploadQueue,
+		Bucket:   cfg.MinioBucket,
+		Exchange: cfg.RabbitExchange,
+		Key:      cfg.RabbitRoutingKey,
 	}
 	localMangaGroup := routerGroup.Group("local")
 	{

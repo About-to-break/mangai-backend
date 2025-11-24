@@ -2,7 +2,6 @@ package router
 
 import (
 	"backend/internal/config"
-	"backend/internal/services"
 	"github.com/gin-gonic/gin"
 
 	"backend/internal/apps/mangalocal"
@@ -12,14 +11,14 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRouters(cfg *config.Config, storage services.StorageService) *gin.Engine {
+func SetupRouters(cfg *config.Config) *gin.Engine {
 	router := gin.Default()
 
 	// Routes from apps
 	appRoutes := router.Group("/")
 	{
 		// Here go app routers groups
-		mangalocal.LocalMangaRoutes(appRoutes, cfg, storage)
+		mangalocal.SetupLocalMangaRoutes(appRoutes, cfg)
 	}
 	// Extra routes
 	router.GET("/ping", func(c *gin.Context) {
