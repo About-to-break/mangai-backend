@@ -25,6 +25,10 @@ paths:
         name: file
         required: true
         type: file
+      - description: Whether to create a sub dir
+        in: formData
+        name: make_dir
+        type: string
       produces:
       - application/json
       responses:

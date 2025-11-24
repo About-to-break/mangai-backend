@@ -55,6 +55,12 @@ const docTemplate = `{
                         "name": "file",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Whether to create a sub dir",
+                        "name": "make_dir",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
