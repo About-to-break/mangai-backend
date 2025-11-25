@@ -24,6 +24,7 @@ func SetupLocalMangaRoutes(routerGroup *gin.RouterGroup, cfg *config.Config) {
 	)
 	if err != nil {
 		slog.Error("Setting up queue failed", err)
+		uploadQueue = nil
 	}
 
 	imageUploadCtrl := UploadController{

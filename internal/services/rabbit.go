@@ -15,12 +15,12 @@ func NewRabbitMQueue(uri string) (*RabbitMQueue, error) {
 	connection, err := amqp091.Dial(uri)
 
 	if err != nil {
-		slog.Error("connect to RabbitMQ fail:", err)
+		slog.Error("connect to RabbitMQ fail:", "err", err)
 		return nil, err
 	}
 	channel, err := connection.Channel()
 	if err != nil {
-		slog.Error("create channel fail:", err)
+		slog.Error("create channel fail:", "err", err)
 		return nil, err
 	}
 	return &RabbitMQueue{
@@ -30,6 +30,10 @@ func NewRabbitMQueue(uri string) (*RabbitMQueue, error) {
 }
 
 func (r *RabbitMQueue) Publish(exchange string, key string, body []byte) error {
+	if r == nil {
+		return errors.New("RabbitMQ was not init")
+	}
+
 	if r.channel == nil {
 		slog.Error("Error connecting to RabbitMQ")
 		return errors.New("rabbitmq channel not initialized")
