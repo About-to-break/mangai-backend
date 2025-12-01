@@ -7,7 +7,7 @@ run:
 	$(DOCKER_COMPOSE) up -d
 
 stop:
-	$(DOCKER_COMPOSE) do
+	$(DOCKER_COMPOSE) down
 logs:
 	$(DOCKER_COMPOSE) logs -f
 

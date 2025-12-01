@@ -3,14 +3,20 @@ info:
 paths:
   /local/:
     get:
-      description: Возвращает index.html
+      description: Возвращает index.html как HTML-страницу
       produces:
       - text/html
       responses:
         "200":
           description: index.html
           schema:
-            type: string
+            type: file
+        "500":
+          description: Ошибка при отдаче файла
+          schema:
+            additionalProperties:
+              type: string
+            type: object
       summary: Отдать главную страницу локального приложения
       tags:
       - LocalManga

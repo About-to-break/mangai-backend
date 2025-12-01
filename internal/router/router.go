@@ -3,6 +3,7 @@ package router
 import (
 	"backend/internal/config"
 	"github.com/gin-gonic/gin"
+	"log/slog"
 
 	"backend/internal/apps/mangalocal"
 
@@ -18,7 +19,11 @@ func SetupRouters(cfg *config.Config) *gin.Engine {
 	appRoutes := router.Group("/")
 	{
 		// Here go app routers groups
-		mangalocal.SetupLocalMangaRoutes(appRoutes, cfg)
+		err := mangalocal.SetupLocalMangaRoutes(appRoutes, cfg)
+		if err != nil {
+			slog.Error("Setup Local Manga Routes Failed")
+			panic(err)
+		}
 	}
 	// Extra routes
 	router.GET("/ping", func(c *gin.Context) {

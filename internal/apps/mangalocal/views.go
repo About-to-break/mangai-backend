@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"log/slog"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
@@ -21,13 +22,33 @@ type UploadController struct {
 
 // IndexView отдаёт статический frontend
 // @Summary Отдать главную страницу локального приложения
-// @Description Возвращает index.html
+// @Description Возвращает index.html как HTML-страницу
 // @Tags LocalManga
-// @Produce html
-// @Success 200 {string} string "index.html"
+// @Produce text/html
+// @Success 200 {file} string "index.html"
+// @Failure 500 {object} map[string]string "Ошибка при отдаче файла"
 // @Router /local/ [get]
 func IndexView(c *gin.Context) {
-	c.File(filepath.Join("frontend", "index.html"))
+	filePath := filepath.Join("frontend", "index.html")
+	slog.Info("Serving IndexView", "file", filePath)
+
+	// Проверяем, что файл существует
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		slog.Error("index.html not found", "error", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": "index.html not found",
+		})
+		return
+	} else if err != nil {
+		slog.Error("Error checking index.html", "error", err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": "Error accessing index.html",
+		})
+		return
+	}
+
+	// Отправляем файл
+	c.File(filePath)
 }
 
 // UploadView обрабатывает загрузку изображения
@@ -94,5 +115,4 @@ func (u *UploadController) UploadView(c *gin.Context) {
 		"status":   "uploaded",
 		"filename": file.Filename,
 	})
-
 }

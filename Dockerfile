@@ -15,5 +15,6 @@ FROM alpine:3.19
 WORKDIR /root/
 
 COPY --from=builder /app/backend .
+COPY --from=builder /app/frontend ./frontend
 
 CMD ["./backend"]

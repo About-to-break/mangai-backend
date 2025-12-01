@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/local/": {
             "get": {
-                "description": "Возвращает index.html",
+                "description": "Возвращает index.html как HTML-страницу",
                 "produces": [
                     "text/html"
                 ],
@@ -29,7 +29,16 @@ const docTemplate = `{
                     "200": {
                         "description": "index.html",
                         "schema": {
-                            "type": "string"
+                            "type": "file"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка при отдаче файла",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }

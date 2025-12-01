@@ -14,11 +14,12 @@ func main() {
 
 	r := router.SetupRouters(cfg)
 
-	err := r.Run(":" + cfg.ServerPort)
-
 	slog.Info("Startup complete")
+
+	err := r.Run("0.0.0.0:" + cfg.ServerPort)
 
 	if err != nil {
 		return
 	}
+
 }

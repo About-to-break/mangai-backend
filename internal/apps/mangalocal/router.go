@@ -7,7 +7,7 @@ import (
 	"log/slog"
 )
 
-func SetupLocalMangaRoutes(routerGroup *gin.RouterGroup, cfg *config.Config) {
+func SetupLocalMangaRoutes(routerGroup *gin.RouterGroup, cfg *config.Config) error {
 
 	uploadStorage, err := services.NewMinioStorage(
 		cfg.MinioEndpoint,
@@ -17,6 +17,7 @@ func SetupLocalMangaRoutes(routerGroup *gin.RouterGroup, cfg *config.Config) {
 	)
 	if err != nil {
 		slog.Error("Setting up storage failed", err)
+		return err
 	}
 
 	uploadQueue, err := services.NewRabbitMQueue(
@@ -25,6 +26,7 @@ func SetupLocalMangaRoutes(routerGroup *gin.RouterGroup, cfg *config.Config) {
 	if err != nil {
 		slog.Error("Setting up queue failed", err)
 		uploadQueue = nil
+		return err
 	}
 
 	imageUploadCtrl := UploadController{
@@ -38,6 +40,10 @@ func SetupLocalMangaRoutes(routerGroup *gin.RouterGroup, cfg *config.Config) {
 	{
 		localMangaGroup.GET("/", IndexView)
 		localMangaGroup.POST("/upload", imageUploadCtrl.UploadView)
+		localMangaGroup.GET("/ping", func(c *gin.Context) {
+			c.JSON(200, gin.H{"message": "pong"})
+		})
 
 	}
+	return nil
 }

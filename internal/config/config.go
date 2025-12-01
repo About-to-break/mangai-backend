@@ -27,7 +27,11 @@ func LoadConfig() *Config {
 	slog.Info("Loading config...")
 
 	if err := godotenv.Load(".env"); err != nil {
-		slog.Warn(".env file was not used in configuration")
+		if os.IsNotExist(err) {
+			slog.Debug(".env file not found; skipping")
+		} else {
+			slog.Warn("Failed to load .env file", "error", err)
+		}
 	}
 	// Generic
 	serverPort := os.Getenv("SERVER_PORT")
